@@ -1,0 +1,5 @@
+app\Main.class
+models\Curso.class
+models\Disciplina.class
+models\Unidade.class
+scraper\Scraper.class
