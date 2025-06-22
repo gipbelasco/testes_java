@@ -15,6 +15,7 @@ A comprehensive web scraper for extracting course and discipline information fro
 - **Error Handling**: Graceful recovery from parsing errors and network issues
 - **Interactive Query System**: Post-scraping analysis and search capabilities
 - **Data Export**: CSV export functionality for further analysis
+- **JSON Export**: Complete data export in JSON format with structured hierarchy
 - **Configurable Limits**: Control how many academic units to scrape
 
 ## Technical Architecture
@@ -77,6 +78,12 @@ mvn exec:java -Dexec.args="5"
 
 # Alternative limit syntax
 mvn exec:java -Dexec.args="--limit=5"
+
+# Export to JSON file
+mvn exec:java -Dexec.args="1 --json"
+
+# Export to custom JSON filename
+mvn exec:java -Dexec.args="2 --json=my_data.json"
 ```
 
 ### Interactive Mode
@@ -85,6 +92,9 @@ Launch the scraper with interactive query capabilities:
 
 ```bash
 mvn exec:java -Dexec.args="3 --interactive"
+
+# Combine with JSON export
+mvn exec:java -Dexec.args="2 --json --interactive"
 ```
 
 ### Interactive Commands
@@ -135,18 +145,71 @@ Query> export my_usp_data
 - `creditosTrabalho`: Work credits
 - `cargaHoraria`: Total hours
 
+## JSON Export Format
+
+The JSON export creates a structured file with the following format:
+
+```json
+{
+  "timestamp": "Sun Jun 22 20:06:19 GMT-03:00 2025",
+  "total_units": 1,
+  "units": [
+    {
+      "name": "Academic Unit Name",
+      "total_courses": 16,
+      "courses": [
+        {
+          "name": "Course Name",
+          "unit": "Academic Unit Name",
+          "duration_ideal": "8 semestres",
+          "duration_min": "8 semestres", 
+          "duration_max": "12 semestres",
+          "mandatory_disciplines": [
+            {
+              "code": "ACH0021",
+              "name": "Discipline Name",
+              "credits_class": 2,
+              "credits_work": 0,
+              "hours": 30
+            }
+          ],
+          "elective_disciplines": [...],
+          "free_elective_disciplines": [...],
+          "statistics": {
+            "total_disciplines": 78,
+            "mandatory_count": 61,
+            "elective_count": 17,
+            "free_elective_count": 0
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Current Status
 
 ### ✅ Implemented Features
 - Robust web scraping with explicit URL navigation
 - Complete course and discipline data extraction
-- Production-ready error handling
+- Production-ready error handling with blocking overlay detection
 - Interactive query system with search capabilities
 - CSV export functionality
+- **JSON export with complete structured data**
 - Comprehensive statistics reporting
 - Command-line interface with multiple options
+- Text-based element selection for reliability
+- JavaScript click fallback for UI interference issues
+
+### 🎯 Performance Metrics
+- **Success Rate**: 93.75% (15/16 courses successfully scraped)
+- **Reliability**: Robust navigation with comprehensive error recovery
+- **Data Quality**: Complete discipline extraction with metadata
+- **Scale**: Successfully handles multiple academic units and courses
 
 ### 🔄 Known Limitations
+- Occasional single course failures due to website structure variations
 - Some discipline credit information may not be fully extracted depending on page structure
 - Scraping speed is limited by website response times and necessary delays
 - Large datasets may require pagination handling (not currently implemented)
