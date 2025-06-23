@@ -1,5 +1,9 @@
 # Scraper de Cursos USP
 
+João Pedro Alonso Almeida - NUSP 11832343
+Samuel Rubens - NUSP 11912533
+Giovanna Belasco - NUSP 
+
 Um web scraper abrangente para extrair informações de cursos e disciplinas do sistema JupiterWeb da Universidade de São Paulo (USP). Esta ferramenta navega através das unidades acadêmicas para coletar dados detalhados sobre cursos e seus currículos.
 
 ## Recursos
