@@ -8,13 +8,13 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println("=== USP Courses Scraper ===");
+        System.out.println("=== Scraper de Cursos USP ===");
         
         // Parse command line arguments
         int limite = 2; // Default limit
         boolean interactiveMode = false;
         boolean exportJson = false;
-        String jsonFileName = "usp_courses_data.json";
+        String jsonFileName = "dados_cursos_usp.json";
         
         for (String arg : args) {
             if (arg.equals("--interactive") || arg.equals("-i")) {
@@ -31,38 +31,38 @@ public class Main {
             }
         }
         
-        System.out.println("Scraping " + limite + " academic units...");
+        System.out.println("Processando " + limite + " unidades acadêmicas...");
         
         Scraper scraper = new Scraper();
         scraper.start(limite);
 
         // Display summary
-        System.out.println("\n=== Scraping Summary ===");
+        System.out.println("\n=== Resumo do Processamento ===");
         int totalCourses = 0;
         int totalDisciplines = 0;
         
         for (Unidade unidade : scraper.unidades) {
-            System.out.println("Unit: " + unidade.nome + " (" + unidade.cursos.size() + " courses)");
+            System.out.println("Unidade: " + unidade.nome + " (" + unidade.cursos.size() + " cursos)");
             totalCourses += unidade.cursos.size();
             
             for (Curso curso : unidade.cursos) {
                 int courseDisciplines = curso.obrigatorias.size() + curso.optativasEletivas.size() + curso.optativasLivres.size();
                 totalDisciplines += courseDisciplines;
-                System.out.printf("  - %s (%d disciplines: %d mandatory, %d elective, %d free)\n",
+                System.out.printf("  - %s (%d disciplinas: %d obrigatórias, %d eletivas, %d livres)\n",
                     curso.nome, courseDisciplines, curso.obrigatorias.size(), 
                     curso.optativasEletivas.size(), curso.optativasLivres.size());
             }
         }
         
-        System.out.println("\nTotal: " + scraper.unidades.size() + " units, " + totalCourses + " courses, " + totalDisciplines + " disciplines");
+        System.out.println("\nTotal: " + scraper.unidades.size() + " unidades, " + totalCourses + " cursos, " + totalDisciplines + " disciplinas");
         
         // Export to JSON if requested
         if (exportJson) {
             try {
                 exportToJson(scraper.unidades, jsonFileName);
-                System.out.println("Data exported to: " + jsonFileName);
+                System.out.println("Dados exportados para: " + jsonFileName);
             } catch (IOException e) {
-                System.err.println("Error exporting to JSON: " + e.getMessage());
+                System.err.println("Erro ao exportar para JSON: " + e.getMessage());
             }
         }
         
@@ -71,10 +71,10 @@ public class Main {
             ConsultasManager consultas = new ConsultasManager(scraper.unidades);
             consultas.startInteractiveMode();
         } else {
-            System.out.println("\nTo use interactive query mode, run with: --interactive");
-            System.out.println("To set custom limit: --limit=N or just N");
+            System.out.println("\nPara usar o modo de consulta interativo, execute com: --interactive");
+            System.out.println("Para definir limite personalizado: --limit=N ou apenas N");
             if (!exportJson) {
-                System.out.println("To export JSON: --json or --json=filename.json");
+                System.out.println("Para exportar JSON: --json ou --json=nome_arquivo.json");
             }
         }
     }

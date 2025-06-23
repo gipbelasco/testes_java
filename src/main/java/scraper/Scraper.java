@@ -25,16 +25,16 @@ public class Scraper {
     }
 
     public void start(int limiteUnidades) throws Exception {
-        System.out.println("Starting scraper with limit: " + limiteUnidades);
+        System.out.println("Iniciando scraper com limite: " + limiteUnidades);
         
         driver.get(baseUrl);
-        System.out.println("Navigated to USP page: " + driver.getTitle());
+        System.out.println("Navegou para página USP: " + driver.getTitle());
         
         WebElement selectUnidade = wait.until(d -> d.findElement(By.xpath("//select[@id='comboUnidade']")));
-        System.out.println("Found units dropdown");
+        System.out.println("Encontrado dropdown de unidades");
 
         List<WebElement> opcoesUnidades = new Select(selectUnidade).getOptions();
-        System.out.println("Found " + opcoesUnidades.size() + " units available");
+        System.out.println("Encontradas " + opcoesUnidades.size() + " unidades disponíveis");
         
         // Extract unit names first to avoid stale element issues
         List<String> unitNames = new ArrayList<>();
@@ -44,15 +44,15 @@ public class Scraper {
         
         for (int i = 0; i < unitNames.size(); i++) {
             String nomeUnidade = unitNames.get(i);
-            System.out.println("\n=== Processing Unit " + (i+1) + ": " + nomeUnidade + " ===");
+            System.out.println("\n=== Processando Unidade " + (i+1) + ": " + nomeUnidade + " ===");
             
             Unidade unidade = processUnidade(nomeUnidade);
             unidades.add(unidade);
             
-            System.out.println("Completed unit: " + nomeUnidade + " with " + unidade.cursos.size() + " courses");
+            System.out.println("Unidade concluída: " + nomeUnidade + " com " + unidade.cursos.size() + " cursos");
         }
 
-        System.out.println("\nScraping completed. Total units: " + unidades.size());
+        System.out.println("\nProcessamento concluído. Total de unidades: " + unidades.size());
         driver.quit();
     }
 
@@ -82,12 +82,12 @@ public class Scraper {
                         (optionText.contains(nomeUnidade.split(" - ")[0]) && nomeUnidade.split(" - ")[0].length() > 10)) {
                         option.click();
                         found = true;
-                        System.out.println("Selected unit: '" + optionText + "'");
+                        System.out.println("Unidade selecionada: '" + optionText + "'");
                         break;
                     }
                 }
                 if (!found) {
-                    throw new RuntimeException("Could not find unit in processUnidade: " + nomeUnidade);
+                    throw new RuntimeException("Não foi possível encontrar unidade em processUnidade: " + nomeUnidade);
                 }
             }
             
@@ -97,7 +97,7 @@ public class Scraper {
             
             WebElement selectCurso = driver.findElement(By.xpath("//select[@id='comboCurso']"));
             List<WebElement> opcoesCurso = new Select(selectCurso).getOptions();
-            System.out.println("Found " + opcoesCurso.size() + " courses for this unit");
+            System.out.println("Encontrados " + opcoesCurso.size() + " cursos para esta unidade");
             
             // Extract course names first to avoid stale element issues
             List<String> courseNames = new ArrayList<>();
@@ -108,7 +108,7 @@ public class Scraper {
             // Process each course
             for (int j = 0; j < courseNames.size(); j++) {
                 String courseName = courseNames.get(j);
-                System.out.println("\n--- Processing Course " + (j+1) + ": " + courseName + " ---");
+                System.out.println("\n--- Processando Curso " + (j+1) + ": " + courseName + " ---");
                 
                 try {
                     Curso curso = processCourse(courseName, nomeUnidade);
@@ -116,13 +116,13 @@ public class Scraper {
                         unidade.cursos.add(curso);
                     }
                 } catch (Exception e) {
-                    System.err.println("Error processing course " + courseName + ": " + e.getMessage());
+                    System.err.println("Erro processando curso " + courseName + ": " + e.getMessage());
                     // Continue with next course
                 }
             }
             
         } catch (Exception e) {
-            System.err.println("Error processing unit " + nomeUnidade + ": " + e.getMessage());
+            System.err.println("Erro processando unidade " + nomeUnidade + ": " + e.getMessage());
         }
         
         return unidade;
@@ -171,20 +171,20 @@ public class Scraper {
                         (optionText.contains(unitName.split(" - ")[0]) && unitName.split(" - ")[0].length() > 10)) {
                         option.click();
                         found = true;
-                        System.out.println("Selected unit by partial match: '" + optionText + "' for target: '" + unitName + "'");
+                        System.out.println("Unidade selecionada por correspondência parcial: '" + optionText + "' para alvo: '" + unitName + "'");
                         break;
                     }
                 }
                 if (!found) {
                     // Debug: print all available options
-                    System.err.println("Available unit options:");
+                    System.err.println("Opções de unidade disponíveis:");
                     for (WebElement option : unitOptions) {
                         String optText = option.getText().trim();
                         if (!optText.isEmpty()) {
                             System.err.println("  - '" + optText + "'");
                         }
                     }
-                    throw new RuntimeException("Could not find unit: " + unitName);
+                    throw new RuntimeException("Não foi possível encontrar unidade: " + unitName);
                 }
             }
             
@@ -208,17 +208,17 @@ public class Scraper {
                         optionText.contains(courseName.substring(0, Math.min(courseName.length(), 30)))) {  // First 30 chars match
                         option.click();
                         found = true;
-                        System.out.println("Selected course by partial match: '" + optionText + "' for target: '" + courseName + "'");
+                        System.out.println("Curso selecionado por correspondência parcial: '" + optionText + "' para alvo: '" + courseName + "'");
                         break;
                     }
                 }
                 if (!found) {
                     // Debug: print all available options
-                    System.err.println("Available course options:");
+                    System.err.println("Opções de curso disponíveis:");
                     for (WebElement option : courseOptions) {
                         System.err.println("  - '" + option.getText() + "'");
                     }
-                    throw new RuntimeException("Could not find course: " + courseName);
+                    throw new RuntimeException("Não foi possível encontrar curso: " + courseName);
                 }
             }
             
@@ -258,11 +258,11 @@ public class Scraper {
                 try {
                     targetTab.click();
                 } catch (ElementClickInterceptedException e) {
-                    System.out.println("Regular click intercepted, trying JavaScript click...");
+                    System.out.println("Clique regular interceptado, tentando clique JavaScript...");
                     ((JavascriptExecutor) driver).executeScript("arguments[0].click();", targetTab);
                 }
                 
-                System.out.println("Clicked on Grade Curricular tab");
+                System.out.println("Clicou na aba Grade Curricular");
                 
                 // Wait for tab content to load
                 Thread.sleep(2000);
@@ -272,12 +272,12 @@ public class Scraper {
                 
                 return parseCurso(doc, courseName, unitName);
             } else {
-                System.err.println("Could not find Grade Curricular tab for course: " + courseName);
+                System.err.println("Não foi possível encontrar aba Grade Curricular para curso: " + courseName);
                 return null;
             }
             
         } catch (Exception e) {
-            System.err.println("Error in processCourse for " + courseName + ": " + e.getMessage());
+            System.err.println("Erro em processCourse para " + courseName + ": " + e.getMessage());
             return null;
         }
     }
@@ -285,7 +285,7 @@ public class Scraper {
     private Curso parseCurso(Document doc, String nomeCurso, String nomeUnidade) {
         Curso curso = new Curso(nomeCurso, nomeUnidade);
         
-        System.out.println("Parsing course: " + nomeCurso);
+        System.out.println("Analisando curso: " + nomeCurso);
         
         // Extract course duration from the text content
         String pageText = doc.text();
@@ -309,7 +309,7 @@ public class Scraper {
                     curso.duracaoMin = afterMin.split("\\s+")[0] + " " + afterMin.split("\\s+")[1];
                 }
             } catch (Exception e) {
-                System.out.println("Error parsing duração mínima: " + e.getMessage());
+                System.out.println("Erro analisando duração mínima: " + e.getMessage());
             }
         }
         
@@ -321,11 +321,11 @@ public class Scraper {
                     curso.duracaoMax = afterMax;
                 }
             } catch (Exception e) {
-                System.out.println("Error parsing duração máxima: " + e.getMessage());
+                System.out.println("Erro analisando duração máxima: " + e.getMessage());
             }
         }
         
-        System.out.println("Extracted course durations successfully");
+        System.out.println("Durações do curso extraídas com sucesso");
 
         // Look for discipline tables with specific structure
         Elements allTables = doc.select("table");
@@ -342,17 +342,17 @@ public class Scraper {
             
             if (firstRowText.contains("Disciplinas Obrigatórias")) {
                 targetList = curso.obrigatorias;
-                categoryName = "MANDATORY";
+                categoryName = "OBRIGATÓRIAS";
             } else if (firstRowText.contains("Disciplinas Optativas Eletivas")) {
                 targetList = curso.optativasEletivas;
-                categoryName = "ELECTIVE";
+                categoryName = "ELETIVAS";
             } else if (firstRowText.contains("Disciplinas Optativas Livres")) {
                 targetList = curso.optativasLivres;
-                categoryName = "FREE_ELECTIVE";
+                categoryName = "OPTATIVAS_LIVRES";
             }
             
             if (targetList != null) {
-                System.out.println("Processing " + categoryName + " disciplines...");
+                System.out.println("Processando disciplinas " + categoryName + "...");
                 
                 // Check if second row looks like a header
                 boolean hasHeader = false;
@@ -406,11 +406,11 @@ public class Scraper {
                     }
                 }
                 
-                System.out.println("Found " + targetList.size() + " " + categoryName.toLowerCase() + " disciplines");
+                System.out.println("Encontradas " + targetList.size() + " disciplinas " + categoryName.toLowerCase());
             }
         }
         
-        System.out.println("Course parsed successfully - Total disciplines: " + 
+        System.out.println("Curso analisado com sucesso - Total de disciplinas: " + 
                           (curso.obrigatorias.size() + curso.optativasEletivas.size() + curso.optativasLivres.size()));
         
         return curso;

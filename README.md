@@ -1,153 +1,153 @@
-# USP Courses Scraper
+# Scraper de Cursos USP
 
-A comprehensive web scraper for extracting course and discipline information from the University of São Paulo (USP) JupiterWeb system. This tool navigates through academic units to collect detailed data about courses and their curricula.
+Um web scraper abrangente para extrair informações de cursos e disciplinas do sistema JupiterWeb da Universidade de São Paulo (USP). Esta ferramenta navega através das unidades acadêmicas para coletar dados detalhados sobre cursos e seus currículos.
 
-## Features
+## Recursos
 
-- **Automated Web Scraping**: Navigates through USP's JupiterWeb interface to extract course data
-- **Comprehensive Data Extraction**: Collects course information including:
-  - Course name, duration (ideal, minimum, maximum)
-  - Mandatory disciplines (disciplinas obrigatórias)
-  - Elective disciplines (disciplinas optativas eletivas)  
-  - Free elective disciplines (disciplinas optativas livres)
-  - Discipline details: código, nome, créditos aula, créditos trabalho, carga horária
-- **Robust Navigation**: Uses explicit URL navigation instead of browser back/forward for reliability
-- **Error Handling**: Graceful recovery from parsing errors and network issues
-- **Interactive Query System**: Post-scraping analysis and search capabilities
-- **Data Export**: CSV export functionality for further analysis
-- **JSON Export**: Complete data export in JSON format with structured hierarchy
-- **Configurable Limits**: Control how many academic units to scrape
+- **Web Scraping Automatizado**: Navega pela interface JupiterWeb da USP para extrair dados de cursos
+- **Extração Abrangente de Dados**: Coleta informações de cursos incluindo:
+  - Nome do curso, duração (ideal, mínima, máxima)
+  - Disciplinas obrigatórias
+  - Disciplinas optativas eletivas
+  - Disciplinas optativas livres
+  - Detalhes das disciplinas: código, nome, créditos aula, créditos trabalho, carga horária
+- **Navegação Robusta**: Usa navegação explícita por URL ao invés de navegação do browser para maior confiabilidade
+- **Tratamento de Erros**: Recuperação elegante de erros de parsing e problemas de rede
+- **Sistema de Consultas Interativo**: Capacidades de análise e busca pós-scraping
+- **Exportação de Dados**: Funcionalidade de exportação CSV para análises posteriores
+- **Exportação JSON**: Exportação completa de dados em formato JSON com hierarquia estruturada
+- **Limites Configuráveis**: Controle quantas unidades acadêmicas serão processadas
 
-## Technical Architecture
+## Arquitetura Técnica
 
-### Components
+### Componentes
 
-1. **Scraper Class** (`scraper/Scraper.java`)
-   - Main web scraping logic using Selenium WebDriver
-   - Handles navigation through USP's JupiterWeb interface
-   - Parses HTML content using JSoup for data extraction
+1. **Classe Scraper** (`scraper/Scraper.java`)
+   - Lógica principal de web scraping usando Selenium WebDriver
+   - Gerencia navegação pela interface JupiterWeb da USP
+   - Faz parsing do conteúdo HTML usando JSoup para extração de dados
 
-2. **Data Models** (`models/`)
-   - `Unidade.java`: Represents academic units
-   - `Curso.java`: Represents individual courses  
-   - `Disciplina.java`: Represents individual disciplines/subjects
+2. **Modelos de Dados** (`models/`)
+   - `Unidade.java`: Representa unidades acadêmicas
+   - `Curso.java`: Representa cursos individuais
+   - `Disciplina.java`: Representa disciplinas/matérias individuais
 
-3. **Query System** (`app/ConsultasManager.java`)
-   - Interactive command-line interface for data analysis
-   - Search and filter capabilities
-   - Statistics and export functionality
+3. **Sistema de Consultas** (`app/ConsultasManager.java`)
+   - Interface de linha de comando interativa para análise de dados
+   - Capacidades de busca e filtro
+   - Funcionalidades de estatísticas e exportação
 
-4. **Main Application** (`app/Main.java`)
-   - Entry point with command-line argument parsing
-   - Orchestrates scraping and launches query system
+4. **Aplicação Principal** (`app/Main.java`)
+   - Ponto de entrada com parsing de argumentos da linha de comando
+   - Orquestra o scraping e inicia o sistema de consultas
 
-### Dependencies
+### Dependências
 
-- **Selenium WebDriver**: Browser automation
-- **WebDriverManager**: Automatic ChromeDriver management
-- **JSoup**: HTML parsing and data extraction
-- **Maven**: Build and dependency management
+- **Selenium WebDriver**: Automação de browser
+- **WebDriverManager**: Gerenciamento automático do ChromeDriver
+- **JSoup**: Parsing HTML e extração de dados
+- **Maven**: Gerenciamento de build e dependências
 
-## Installation
+## Instalação
 
-### Prerequisites
+### Pré-requisitos
 
-- Java 11 or higher
+- Java 11 ou superior
 - Maven 3.6+
-- Chrome browser (for Selenium WebDriver)
+- Navegador Chrome (para Selenium WebDriver)
 
-### Setup
+### Configuração
 
-1. Clone or download the project
-2. Navigate to the project directory
-3. Install dependencies:
+1. Clone ou baixe o projeto
+2. Navegue até o diretório do projeto
+3. Instale as dependências:
    ```bash
    mvn clean compile
    ```
 
-## Usage
+## Uso
 
-### Basic Scraping
+### Scraping Básico
 
 ```bash
-# Scrape 2 academic units (default)
+# Processar 2 unidades acadêmicas (padrão)
 mvn exec:java
 
-# Scrape 5 academic units
+# Processar 5 unidades acadêmicas
 mvn exec:java -Dexec.args="5"
 
-# Alternative limit syntax
+# Sintaxe alternativa para limite
 mvn exec:java -Dexec.args="--limit=5"
 
-# Export to JSON file
+# Exportar para arquivo JSON
 mvn exec:java -Dexec.args="1 --json"
 
-# Export to custom JSON filename
-mvn exec:java -Dexec.args="2 --json=my_data.json"
+# Exportar para arquivo JSON com nome personalizado
+mvn exec:java -Dexec.args="2 --json=meus_dados.json"
 ```
 
-### Interactive Mode
+### Modo Interativo
 
-Launch the scraper with interactive query capabilities:
+Execute o scraper com capacidades de consulta interativa:
 
 ```bash
 mvn exec:java -Dexec.args="3 --interactive"
 
-# Combine with JSON export
+# Combinar com exportação JSON
 mvn exec:java -Dexec.args="2 --json --interactive"
 ```
 
-### Interactive Commands
+### Comandos Interativos
 
-Once in interactive mode, you can use these commands:
+Uma vez no modo interativo, você pode usar estes comandos:
 
-- `list-units` - Show all scraped academic units
-- `list-courses [unit]` - Show courses in a specific unit or all courses
-- `search-course [name]` - Search for courses by name
-- `search-discipline [name]` - Search for disciplines by name or code
-- `course-details [course]` - Show detailed information about a course
-- `statistics` - Display general statistics about scraped data
-- `export [filename]` - Export data to CSV format
-- `exit` - Exit the interactive system
+- `list-units` - Mostrar todas as unidades acadêmicas processadas
+- `list-courses [unidade]` - Mostrar cursos em uma unidade específica ou todos os cursos
+- `search-course [nome]` - Buscar cursos por nome
+- `search-discipline [nome]` - Buscar disciplinas por nome ou código
+- `course-details [curso]` - Mostrar informações detalhadas sobre um curso
+- `statistics` - Exibir estatísticas gerais sobre os dados processados
+- `export [arquivo]` - Exportar dados para formato CSV
+- `exit` - Sair do sistema interativo
 
-### Examples
+### Exemplos
 
 ```bash
-# Interactive session examples
+# Exemplos de sessão interativa
 Query> list-units
 Query> search-course biotecnologia
 Query> course-details "Bacharelado em Biotecnologia"
 Query> search-discipline MAT
 Query> statistics
-Query> export my_usp_data
+Query> export meus_dados_usp
 ```
 
-## Data Models
+## Modelos de Dados
 
-### Unidade (Academic Unit)
-- `nome`: Name of the academic unit
-- `cursos`: List of courses offered by this unit
+### Unidade (Unidade Acadêmica)
+- `nome`: Nome da unidade acadêmica
+- `cursos`: Lista de cursos oferecidos por esta unidade
 
-### Curso (Course)
-- `nome`: Course name
-- `unidade`: Academic unit offering the course
-- `duracaoIdeal`: Ideal duration (e.g., "8 semestres")
-- `duracaoMin`: Minimum duration
-- `duracaoMax`: Maximum duration
-- `obrigatorias`: List of mandatory disciplines
-- `optativasEletivas`: List of elective disciplines
-- `optativasLivres`: List of free elective disciplines
+### Curso (Curso)
+- `nome`: Nome do curso
+- `unidade`: Unidade acadêmica que oferece o curso
+- `duracaoIdeal`: Duração ideal (ex: "8 semestres")
+- `duracaoMin`: Duração mínima
+- `duracaoMax`: Duração máxima
+- `obrigatorias`: Lista de disciplinas obrigatórias
+- `optativasEletivas`: Lista de disciplinas optativas eletivas
+- `optativasLivres`: Lista de disciplinas optativas livres
 
-### Disciplina (Discipline)
-- `codigo`: Discipline code (e.g., "MAT2453")
-- `nome`: Discipline name
-- `creditosAula`: Class credits
-- `creditosTrabalho`: Work credits
-- `cargaHoraria`: Total hours
+### Disciplina (Disciplina)
+- `codigo`: Código da disciplina (ex: "MAT2453")
+- `nome`: Nome da disciplina
+- `creditosAula`: Créditos aula
+- `creditosTrabalho`: Créditos trabalho
+- `cargaHoraria`: Total de horas
 
-## JSON Export Format
+## Formato de Exportação JSON
 
-The JSON export creates a structured file with the following format:
+A exportação JSON cria um arquivo estruturado com o seguinte formato:
 
 ```json
 {
@@ -155,19 +155,19 @@ The JSON export creates a structured file with the following format:
   "total_units": 1,
   "units": [
     {
-      "name": "Academic Unit Name",
+      "name": "Nome da Unidade Acadêmica",
       "total_courses": 16,
       "courses": [
         {
-          "name": "Course Name",
-          "unit": "Academic Unit Name",
+          "name": "Nome do Curso",
+          "unit": "Nome da Unidade Acadêmica",
           "duration_ideal": "8 semestres",
           "duration_min": "8 semestres", 
           "duration_max": "12 semestres",
           "mandatory_disciplines": [
             {
               "code": "ACH0021",
-              "name": "Discipline Name",
+              "name": "Nome da Disciplina",
               "credits_class": 2,
               "credits_work": 0,
               "hours": 30
@@ -188,71 +188,71 @@ The JSON export creates a structured file with the following format:
 }
 ```
 
-## Current Status
+## Status Atual
 
-### ✅ Implemented Features
-- Robust web scraping with explicit URL navigation
-- Complete course and discipline data extraction
-- Production-ready error handling with blocking overlay detection
-- Interactive query system with search capabilities
-- CSV export functionality
-- **JSON export with complete structured data**
-- Comprehensive statistics reporting
-- Command-line interface with multiple options
-- Text-based element selection for reliability
-- JavaScript click fallback for UI interference issues
+### ✅ Recursos Implementados
+- Web scraping robusto com navegação explícita por URL
+- Extração completa de dados de cursos e disciplinas
+- Tratamento de erros pronto para produção com detecção de sobreposições bloqueantes
+- Sistema de consultas interativo com capacidades de busca
+- Funcionalidade de exportação CSV
+- **Exportação JSON com dados estruturados completos**
+- Relatórios estatísticos abrangentes
+- Interface de linha de comando com múltiplas opções
+- Seleção de elementos baseada em texto para confiabilidade
+- Fallback de clique JavaScript para problemas de interferência da UI
 
-### 🎯 Performance Metrics
-- **Success Rate**: 93.75% (15/16 courses successfully scraped)
-- **Reliability**: Robust navigation with comprehensive error recovery
-- **Data Quality**: Complete discipline extraction with metadata
-- **Scale**: Successfully handles multiple academic units and courses
+### 🎯 Métricas de Performance
+- **Taxa de Sucesso**: 93,75% (15/16 cursos processados com sucesso)
+- **Confiabilidade**: Navegação robusta com recuperação abrangente de erros
+- **Qualidade dos Dados**: Extração completa de disciplinas com metadados
+- **Escala**: Gerencia com sucesso múltiplas unidades acadêmicas e cursos
 
-### 🔄 Known Limitations
-- Occasional single course failures due to website structure variations
-- Some discipline credit information may not be fully extracted depending on page structure
-- Scraping speed is limited by website response times and necessary delays
-- Large datasets may require pagination handling (not currently implemented)
+### 🔄 Limitações Conhecidas
+- Falhas ocasionais de cursos únicos devido a variações na estrutura do site
+- Algumas informações de créditos de disciplinas podem não ser totalmente extraídas dependendo da estrutura da página
+- Velocidade de scraping limitada pelos tempos de resposta do site e delays necessários
+- Datasets grandes podem exigir tratamento de paginação (não implementado atualmente)
 
-### 🚀 Future Enhancements
-- Database persistence options
-- Web-based interface
-- Advanced filtering and sorting options
-- Automated scheduling for regular data updates
-- Performance optimizations for large-scale scraping
+### 🚀 Melhorias Futuras
+- Opções de persistência em banco de dados
+- Interface baseada na web
+- Opções avançadas de filtro e ordenação
+- Agendamento automatizado para atualizações regulares de dados
+- Otimizações de performance para scraping em larga escala
 
-## Performance Notes
+## Notas de Performance
 
-- The scraper includes appropriate delays to respect the target website
-- Each course requires separate page navigation, so scraping time scales with the number of courses
-- Typical performance: ~30-60 seconds per academic unit depending on course count
-- Memory usage is proportional to the amount of data scraped
+- O scraper inclui delays apropriados para respeitar o site alvo
+- Cada curso requer navegação de página separada, então o tempo de scraping escala com o número de cursos
+- Performance típica: ~30-60 segundos por unidade acadêmica dependendo da quantidade de cursos
+- Uso de memória é proporcional à quantidade de dados processados
 
-## Error Handling
+## Tratamento de Erros
 
-The scraper includes comprehensive error handling:
+O scraper inclui tratamento abrangente de erros:
 
-- **Navigation Errors**: Automatic retry with explicit URL navigation
-- **Parsing Errors**: Graceful skipping of problematic content with continued processing
-- **Timeout Handling**: 15-second WebDriver timeouts with appropriate waiting conditions
-- **Data Validation**: Filtering of invalid or header rows in discipline tables
+- **Erros de Navegação**: Retry automático com navegação explícita por URL
+- **Erros de Parsing**: Pular conteúdo problemático graciosamente com processamento continuado
+- **Tratamento de Timeout**: Timeouts do WebDriver de 15 segundos com condições de espera apropriadas
+- **Validação de Dados**: Filtragem de linhas inválidas ou de cabeçalho em tabelas de disciplinas
 
-## Contributing
+## Contribuindo
 
-To contribute to this project:
+Para contribuir com este projeto:
 
-1. Ensure your changes maintain the existing error handling patterns
-2. Test thoroughly with various academic units
-3. Update documentation for any new features
-4. Follow Java coding conventions and include appropriate comments
+1. Certifique-se de que suas alterações mantêm os padrões de tratamento de erros existentes
+2. Teste minuciosamente com várias unidades acadêmicas
+3. Atualize a documentação para quaisquer novos recursos
+4. Siga as convenções de código Java e inclua comentários apropriados
 
-## Technical Notes
+## Notas Técnicas
 
-### Navigation Strategy
-The scraper uses explicit URL navigation (`driver.get(baseUrl)`) instead of browser navigation commands to ensure reliable page state and avoid getting lost in the website's navigation flow.
+### Estratégia de Navegação
+O scraper usa navegação explícita por URL (`driver.get(baseUrl)`) ao invés de comandos de navegação do browser para garantir estado confiável da página e evitar se perder no fluxo de navegação do site.
 
-### Parsing Approach
-HTML parsing combines Selenium for dynamic content loading and JSoup for efficient data extraction, providing both JavaScript execution capability and powerful CSS selector support.
+### Abordagem de Parsing
+O parsing HTML combina Selenium para carregamento de conteúdo dinâmico e JSoup para extração eficiente de dados, fornecendo tanto capacidade de execução JavaScript quanto suporte poderoso a seletores CSS.
 
-### Data Integrity
-The system includes validation to filter out header rows, empty data, and duplicate entries while preserving all valid discipline information.
+### Integridade dos Dados
+O sistema inclui validação para filtrar linhas de cabeçalho, dados vazios e entradas duplicadas enquanto preserva todas as informações válidas de disciplinas.
