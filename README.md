@@ -91,36 +91,224 @@ mvn exec:java -Dexec.args="2 --json=meus_dados.json"
 Execute o scraper com capacidades de consulta interativa:
 
 ```bash
+# Modo interativo real (permite digitação de comandos)
 mvn exec:java -Dexec.args="3 --interactive"
 
 # Combinar com exportação JSON
 mvn exec:java -Dexec.args="2 --json --interactive"
 ```
 
-### Comandos Interativos
+**⚠️ Importante**: Para uso **realmente interativo**, execute apenas o comando acima e aguarde o sistema carregar. Após ver o prompt `Consulta>`, você poderá digitar comandos manualmente.
 
-Uma vez no modo interativo, você pode usar estes comandos:
-
-- `list-units` - Mostrar todas as unidades acadêmicas processadas
-- `list-courses [unidade]` - Mostrar cursos em uma unidade específica ou todos os cursos
-- `search-course [nome]` - Buscar cursos por nome
-- `search-discipline [nome]` - Buscar disciplinas por nome ou código
-- `course-details [curso]` - Mostrar informações detalhadas sobre um curso
-- `statistics` - Exibir estatísticas gerais sobre os dados processados
-- `export [arquivo]` - Exportar dados para formato CSV
-- `exit` - Sair do sistema interativo
-
-### Exemplos
+#### Uso Automatizado (Scripted)
+Se você quiser executar comandos automaticamente sem interação manual, use pipes:
 
 ```bash
-# Exemplos de sessão interativa
-Query> list-units
-Query> search-course biotecnologia
-Query> course-details "Bacharelado em Biotecnologia"
-Query> search-discipline MAT
-Query> statistics
-Query> export meus_dados_usp
+# Execução automatizada de comando específico de estatística
+echo -e "statistics\nexit" | mvn exec:java -Dexec.args="--interactive" -q
+
+# Múltiplos comandos automatizados
+echo -e "list-units\nstatistics\nexport relatorio\nexit" | mvn exec:java -Dexec.args="1 --interactive" -q
 ```
+
+### Comandos Interativos
+
+Uma vez no modo interativo, você pode usar estes comandos detalhados:
+
+#### 1. `list-units`
+- **Função**: Lista todas as unidades acadêmicas processadas
+- **Uso**: `list-units` (sem parâmetros)
+- **Saída**: Mostra numeração, nome da unidade e quantidade de cursos
+- **Exemplo**:
+  ```
+  Consulta> list-units
+  Unidades Acadêmicas (2 total):
+  1. Escola de Comunicações e Artes (16 cursos)
+  2. Instituto de Matemática e Estatística (8 cursos)
+  ```
+
+#### 2. `list-courses [unidade]`
+- **Função**: Lista cursos de uma unidade específica ou de todas as unidades
+- **Uso**: 
+  - `list-courses` (sem parâmetro) - Lista **todos** os cursos de **todas** as unidades
+  - `list-courses "nome da unidade"` - Lista apenas cursos da unidade especificada
+- **Busca**: Aceita nomes parciais de unidades (busca case-insensitive)
+- **Saída**: Nome do curso e quantidade total de disciplinas
+- **Exemplos**:
+  ```
+  Consulta> list-courses
+  Todos os cursos:
+  
+  Escola de Comunicações e Artes:
+    - Bacharelado em Audiovisual (156 disciplinas)
+    - Bacharelado em Biblioteconomia (89 disciplinas)
+  
+  Consulta> list-courses "matemática"
+  Cursos em Instituto de Matemática e Estatística:
+    - Bacharelado em Ciência da Computação (201 disciplinas)
+    - Bacharelado em Estatística (145 disciplinas)
+  ```
+
+#### 3. `search-course [nome]`
+- **Função**: Busca cursos por nome usando correspondência parcial
+- **Uso**: `search-course termo_de_busca` (parâmetro obrigatório)
+- **Busca**: Case-insensitive, busca substring no nome do curso
+- **Saída**: Lista cursos encontrados com unidade de origem e contagem de disciplinas
+- **Exemplos**:
+  ```
+  Consulta> search-course biotecnologia
+  Encontrado(s) 1 curso(s) correspondente(s) a 'biotecnologia':
+    - Bacharelado em Biotecnologia (Instituto de Química) - 78 disciplinas
+  
+  Consulta> search-course computação
+  Encontrado(s) 2 curso(s) correspondente(s) a 'computação':
+    - Bacharelado em Ciência da Computação (IME) - 201 disciplinas
+    - Licenciatura em Computação (EACH) - 134 disciplinas
+  ```
+
+#### 4. `search-discipline [nome]`
+- **Função**: Busca disciplinas por código ou nome em todos os cursos
+- **Uso**: `search-discipline termo_de_busca` (parâmetro obrigatório)
+- **Busca**: Case-insensitive, busca em códigos E nomes de disciplinas
+- **Saída**: Lista disciplinas únicas encontradas e os cursos onde aparecem
+- **Funcionalidade especial**: Agrupa disciplinas duplicadas mostrando todos os cursos onde aparecem
+- **Exemplos**:
+  ```
+  Consulta> search-discipline MAT
+  Disciplinas encontradas correspondentes a 'MAT':
+    - MAT0111 - Cálculo Diferencial e Integral I
+      Encontrada em: Bacharelado em Ciência da Computação, Bacharelado em Estatística
+    - MAT2453 - Cálculo Diferencial e Integral para Computação
+      Encontrada em: Bacharelado em Sistemas de Informação
+  
+  Consulta> search-discipline "álgebra linear"
+  Disciplinas encontradas correspondentes a 'álgebra linear':
+    - MAT0105 - Geometria Analítica e Álgebra Linear
+      Encontrada em: Bacharelado em Física, Bacharelado em Química
+  ```
+
+#### 5. `course-details [curso]`
+- **Função**: Exibe informações completas e detalhadas de um curso
+- **Uso**: `course-details "nome do curso"` (parâmetro obrigatório)
+- **Busca**: Case-insensitive, busca substring no nome do curso (primeiro encontrado)
+- **Saída**: Informações completas incluindo:
+  - Nome completo e unidade acadêmica
+  - Durações (ideal, mínima, máxima)
+  - **Todas** as disciplinas organizadas por categoria com códigos
+- **Exemplo**:
+  ```
+  Consulta> course-details "biotecnologia"
+  === Detalhes do Curso ===
+  Nome: Bacharelado em Biotecnologia
+  Unidade: Instituto de Química
+  Duração Ideal: 8 semestres
+  Duração Mínima: 8 semestres
+  Duração Máxima: 12 semestres
+  
+  Disciplinas Obrigatórias (61):
+    - ACH0021 - Transformações Químicas
+    - QFL0111 - Química Geral I
+    [... lista completa ...]
+  
+  Disciplinas Optativas Eletivas (17):
+    - QBQ0315 - Bioquímica Experimental
+    [... lista completa ...]
+  ```
+
+#### 6. `statistics`
+- **Função**: Exibe estatísticas abrangentes dos dados processados
+- **Uso**: `statistics` (sem parâmetros)
+- **Saída**: Métricas completas incluindo:
+  - Contagem de unidades, cursos e disciplinas
+  - Breakdown por tipo de disciplina (obrigatórias, eletivas, optativas livres)
+  - Médias calculadas (cursos por unidade, disciplinas por curso)
+- **Exemplo**:
+  ```
+  Consulta> statistics
+  === Estatísticas de Cursos USP ===
+  Unidades Acadêmicas: 2
+  Total de Cursos: 50
+  Total de Disciplinas: 5899
+    - Obrigatórias: 4234
+    - Eletivas: 1456
+    - Optativas Livres: 209
+  Média de Cursos por Unidade: 25.0
+  Média de Disciplinas por Curso: 117.9
+  ```
+
+#### 7. `export [arquivo]`
+- **Função**: Exporta todos os dados para arquivo CSV formatado
+- **Uso**: 
+  - `export` (sem parâmetro) - Usa nome padrão: `exportacao_cursos_usp.csv`
+  - `export nome_arquivo` - Usa nome personalizado (extensão .csv adicionada automaticamente)
+- **Formato**: CSV com colunas: Unidade, Curso, Tipo_Disciplina, Codigo, Nome, Creditos_Aula, Creditos_Trabalho, Horas
+- **Dados**: Inclui **todas** as disciplinas de **todos** os cursos com metadados completos
+- **Exemplos**:
+  ```
+  Consulta> export
+  Dados exportados para: exportacao_cursos_usp.csv
+  
+  Consulta> export meus_dados_usp
+  Dados exportados para: meus_dados_usp.csv
+  ```
+
+#### 8. `exit`
+- **Função**: Encerra o sistema interativo
+- **Uso**: `exit` (sem parâmetros)
+- **Ação**: Retorna ao terminal com mensagem de despedida
+
+### Exemplos de Uso Interativo
+
+```bash
+# Sessão interativa completa demonstrando todas as funcionalidades
+Consulta> list-units
+Unidades Acadêmicas (2 total):
+1. Escola de Comunicações e Artes (16 cursos)  
+2. Instituto de Matemática e Estatística (8 cursos)
+
+Consulta> list-courses "matemática"
+Cursos em Instituto de Matemática e Estatística:
+  - Bacharelado em Ciência da Computação (201 disciplinas)
+  - Bacharelado em Estatística (145 disciplinas)
+
+Consulta> search-course biotecnologia
+Encontrado(s) 1 curso(s) correspondente(s) a 'biotecnologia':
+  - Bacharelado em Biotecnologia (Instituto de Química) - 78 disciplinas
+
+Consulta> course-details "biotecnologia"
+=== Detalhes do Curso ===
+Nome: Bacharelado em Biotecnologia
+Unidade: Instituto de Química
+[... informações detalhadas completas ...]
+
+Consulta> search-discipline "cálculo"
+Disciplinas encontradas correspondentes a 'cálculo':
+  - MAT0111 - Cálculo Diferencial e Integral I
+    Encontrada em: Bacharelado em Ciência da Computação, Bacharelado em Estatística
+  [... outras disciplinas ...]
+
+Consulta> statistics
+=== Estatísticas de Cursos USP ===
+Unidades Acadêmicas: 2
+Total de Cursos: 50
+Total de Disciplinas: 5899
+[... estatísticas detalhadas ...]
+
+Consulta> export dados_completos_usp
+Dados exportados para: dados_completos_usp.csv
+
+Consulta> exit
+Saindo do sistema de consultas. Até logo!
+```
+
+### Dicas de Uso do Modo Interativo
+
+- **Busca Flexível**: Todos os comandos de busca (`search-course`, `search-discipline`, `course-details`) usam correspondência parcial case-insensitive
+- **Parâmetros Opcionais**: Comandos como `list-courses` e `export` funcionam com ou sem parâmetros
+- **Nomes com Espaços**: Use aspas para nomes com espaços: `course-details "ciência da computação"`
+- **Disciplinas Duplicadas**: O comando `search-discipline` automaticamente agrupa disciplinas que aparecem em múltiplos cursos
+- **Exportação Automática**: Arquivos CSV são criados no diretório atual com formatação padronizada
+- **Navegação Intuitiva**: Use `list-units` → `list-courses` → `course-details` para explorar hierarquicamente
 
 ## Modelos de Dados
 
@@ -191,9 +379,9 @@ A exportação JSON cria um arquivo estruturado com o seguinte formato:
 ## Status Atual
 
 ### ✅ Recursos Implementados
-- Web scraping robusto com navegação explícita por URL
-- Extração completa de dados de cursos e disciplinas
-- Tratamento de erros pronto para produção com detecção de sobreposições bloqueantes
+- Web scraping com navegação explícita por URL
+- Extração de dados de cursos e disciplinas
+- Tratamento de erros com detecção de sobreposições bloqueantes
 - Sistema de consultas interativo com capacidades de busca
 - Funcionalidade de exportação CSV
 - **Exportação JSON com dados estruturados completos**
@@ -202,14 +390,9 @@ A exportação JSON cria um arquivo estruturado com o seguinte formato:
 - Seleção de elementos baseada em texto para confiabilidade
 - Fallback de clique JavaScript para problemas de interferência da UI
 
-### 🎯 Métricas de Performance
-- **Taxa de Sucesso**: 93,75% (15/16 cursos processados com sucesso)
-- **Confiabilidade**: Navegação robusta com recuperação abrangente de erros
-- **Qualidade dos Dados**: Extração completa de disciplinas com metadados
-- **Escala**: Gerencia com sucesso múltiplas unidades acadêmicas e cursos
-
 ### 🔄 Limitações Conhecidas
 - Falhas ocasionais de cursos únicos devido a variações na estrutura do site
+- Vários cursos de música da Escola de Comunicações de Artes (ECA) sem informações de seus cursos
 - Algumas informações de créditos de disciplinas podem não ser totalmente extraídas dependendo da estrutura da página
 - Velocidade de scraping limitada pelos tempos de resposta do site e delays necessários
 - Datasets grandes podem exigir tratamento de paginação (não implementado atualmente)
