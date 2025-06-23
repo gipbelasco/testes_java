@@ -1,5 +1,6 @@
-app\Main.class
-models\Curso.class
-models\Disciplina.class
-models\Unidade.class
-scraper\Scraper.class
+models/Disciplina.class
+app/Main.class
+scraper/Scraper.class
+app/ConsultasManager.class
+models/Unidade.class
+models/Curso.class
